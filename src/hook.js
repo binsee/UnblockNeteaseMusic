@@ -70,6 +70,8 @@ hook.target.path = new Set([
 	'/api/usertool/sound/mobile/animationList',
 	'/api/usertool/sound/mobile/all',
 	'/api/usertool/sound/mobile/detail',
+	'/api/ad/loading/current',
+	'/api/ad/loading/get',
 ])
 
 const domainList = [
@@ -165,9 +167,11 @@ hook.request.after = ctx => {
 			}
 			else if (netease.path.includes('url')) return tryMatch(ctx)
 			else if (netease.path.includes('/usertool/sound/')) return unblockSoundEffects(netease.jsonBody)
+			else if (netease.path.includes('/ad/loading')) return blockLoadingAds(netease.jsonBody)
 			else if (netease.path.includes('batch')) {
 				for (const key in netease.jsonBody) {
 					if (key.includes('/usertool/sound/')) unblockSoundEffects(netease.jsonBody[key])
+					else if (key.includes('/api/banner/get/v3')) blockBannerAds(netease.jsonBody[key])
 				}
 			}
 		})
@@ -353,6 +357,16 @@ const unblockSoundEffects = obj => {
 	if (code === 200) {
 		if (Array.isArray(data)) data.map(item => {if (item.type) item.type=1})
 		else if (data.type) data.type=1
+	}
+}
+
+const blockLoadingAds = obj => {
+	if (obj.ads && Array.isArray(obj.ads)) obj.ads=[]
+}
+const blockBannerAds = obj => {
+	const {banners,code} = obj
+	if (code === 200) {
+		if (Array.isArray(banners)) obj.banners=banners.filter(item => !item.adDispatchJson)
 	}
 }
 
