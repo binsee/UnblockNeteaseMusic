@@ -171,7 +171,7 @@ hook.request.after = ctx => {
 			else if (netease.path.includes('batch')) {
 				for (const key in netease.jsonBody) {
 					if (key.includes('/usertool/sound/')) unblockSoundEffects(netease.jsonBody[key])
-					else if (key.includes('/api/banner/get/v3')) blockBannerAds(netease.jsonBody[key])
+					else if (key.includes('/banner/')) blockBannerAds(netease.jsonBody[key])
 				}
 			}
 		})
